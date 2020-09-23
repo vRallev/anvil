@@ -12,7 +12,6 @@ import com.squareup.anvil.compiler.codegen.dagger.ProvidesMethodFactoryGenerator
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.codegen.extensions.ExpressionCodegenExtension
 import org.jetbrains.kotlin.com.intellij.mock.MockProject
-import org.jetbrains.kotlin.com.intellij.openapi.extensions.Extensions
 import org.jetbrains.kotlin.com.intellij.openapi.extensions.impl.ExtensionPointImpl
 import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
 import org.jetbrains.kotlin.config.CompilerConfiguration
@@ -91,11 +90,10 @@ class AnvilComponentRegistrar : ComponentRegistrar {
     project: MockProject,
     extension: AnalysisHandlerExtension
   ) {
-    @Suppress("DEPRECATION")
-    val analysisHandlerExtensionPoint = Extensions.getArea(project)
+    val analysisHandlerExtensionPoint = project.extensionArea
         .getExtensionPoint(AnalysisHandlerExtension.extensionPointName)
 
-    val registeredExtensions = AnalysisHandlerExtension.getInstances(project)
+    val registeredExtensions = analysisHandlerExtensionPoint.extensionList
     registeredExtensions.forEach {
       // This doesn't work reliably, but that's the best we can do with public APIs. There's a bug
       // for inner classes where they convert the given class to a String "a.b.C.Inner" and then
@@ -116,8 +114,8 @@ class AnvilComponentRegistrar : ComponentRegistrar {
       "There are still registered extensions."
     }
 
-    AnalysisHandlerExtension.registerExtension(project, extension)
-    registeredExtensions.forEach { AnalysisHandlerExtension.registerExtension(project, it) }
+    analysisHandlerExtensionPoint.registerExtension(extension, project)
+    registeredExtensions.forEach { analysisHandlerExtensionPoint.registerExtension(it, project) }
   }
 
   private fun <T : AnalysisHandlerExtension> ExtensionPointImpl<T>.unregisterExtensionFixed(
