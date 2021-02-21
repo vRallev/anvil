@@ -80,8 +80,8 @@ public final class DaggerModule1_ProvideStringFactory implements Factory<String>
       package com.squareup.test
       
       @dagger.Module
-      class DaggerModule1 {
-        @dagger.Provides fun provideString(): String = "abc"
+      object DaggerModule1 {
+        @dagger.Provides internal fun provideString(): String = "abc"
       }
       """
     ) {
@@ -701,7 +701,7 @@ public final class DaggerModule1_ProvideStringFactory implements Factory<String>
       
       @dagger.Module
       object DaggerModule1 {
-        @dagger.Provides fun provideString(): String = "abc"
+        @dagger.Provides internal fun provideString(): String = "abc"
       }
       """
     ) {
